@@ -1,0 +1,582 @@
+/*
+ * quiz-theme.css — стили corner pop-up виджета.
+ *
+ * Виджет монтируется как floating card в правом нижнем углу экрана.
+ * Никакого оверлея и затемнения фона — не мешает пользователю.
+ * Все селекторы ограничены eb-quiz__*, чтобы не конфликтовать со стилями хоста.
+ */
+
+/* ==========================================================================
+   0. CSS-переменные (тема)
+   ========================================================================== */
+
+:root {
+  --eb-violet-900:   #4528A8;
+  --eb-yellow-500:   #FFBC5B;
+  --eb-violet-700:   #653FE5;
+  --eb-violet-050:   #E9E6FE;
+  --eb-surface:      #F7F4FD;
+  --eb-text:         #111;
+  --eb-muted:        rgba(17, 17, 17, .65);
+  --eb-border:       rgba(69, 40, 168, .18);
+  --eb-font-ui:      Inter, system-ui, sans-serif;
+  --eb-font-display: "RF Rostin", "IBM Plex Mono", monospace;
+  --eb-radius-lg:    20px;
+  --eb-shadow-lg:    0 20px 60px rgba(0, 0, 0, .18);
+
+  --eb-popup-width:  360px;
+  --eb-btn-radius:   12px;
+  --eb-input-radius: 10px;
+  --eb-transition:   0.2s ease;
+}
+
+
+/* ==========================================================================
+   1. Popup — floating card (правый нижний угол)
+   ========================================================================== */
+
+.eb-quiz__overlay {
+  position:        fixed;
+  top:             0;
+  left:            0;
+  width:           100vw;
+  height:          100vh;
+  background:      rgba(0, 0, 0, .55);
+  z-index:         9998;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  animation:       eb-overlay-in .25s ease both;
+}
+
+@keyframes eb-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.eb-quiz__popup {
+  position:      relative;
+  width:         360px;
+  max-width:     calc(100vw - 32px);
+  max-height:    90vh;
+  overflow-y:    auto;
+  z-index:       9999;
+  background:    var(--eb-surface);
+  border-radius: var(--eb-radius-lg);
+  box-shadow:    var(--eb-shadow-lg);
+  font-family:   var(--eb-font-ui);
+  color:         var(--eb-text);
+
+  animation: eb-popup-in .35s cubic-bezier(.22,.68,0,1.15) both;
+}
+
+@keyframes eb-popup-in {
+  from { opacity: 0; transform: translateY(20px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   }
+}
+
+
+.eb-quiz__body {
+  display:        flex;
+  flex-direction: column;
+  gap:            16px;
+  padding:        24px;
+}
+
+/* В расширенном состоянии чуть больше паддинга сверху (под кнопку закрытия) */
+.eb-quiz__popup--expanded .eb-quiz__body {
+  padding-top: 44px;
+}
+
+
+/* ==========================================================================
+   2. Кнопка закрытия (только в расширенном состоянии)
+   ========================================================================== */
+
+.eb-quiz__close {
+  position:        absolute;
+  top:             12px;
+  right:           12px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           28px;
+  height:          28px;
+  padding:         0;
+  background:      transparent;
+  border:          none;
+  border-radius:   50%;
+  color:           var(--eb-muted);
+  font-size:       16px;
+  line-height:     1;
+  cursor:          pointer;
+  transition:      background var(--eb-transition), color var(--eb-transition);
+}
+
+.eb-quiz__close:hover {
+  background: var(--eb-violet-050);
+  color:      var(--eb-violet-900);
+}
+
+
+/* ==========================================================================
+   3. Тизер — первый экран (маленькая карточка)
+   ========================================================================== */
+
+.eb-quiz__teaser {
+  display:        flex;
+  flex-direction: column;
+  gap:            16px;
+  text-align:     center;
+}
+
+.eb-quiz__teaser-title {
+  margin:      0;
+  font-size:   16px;
+  font-weight: 600;
+  line-height: 1.45;
+  color:       var(--eb-text);
+}
+
+.eb-quiz__teaser-subtitle {
+  margin:      0;
+  font-size:   13px;
+  font-weight: 400;
+  line-height: 1.55;
+  color:       var(--eb-muted);
+}
+
+.eb-quiz__teaser-actions {
+  display: flex;
+  gap:     10px;
+}
+
+/* «Да, интересно» */
+.eb-quiz__btn--accept {
+  flex:          1;
+  padding:       11px 16px;
+  background:    linear-gradient(135deg, var(--eb-violet-700), var(--eb-violet-900));
+  color:         #fff;
+  font-family:   var(--eb-font-ui);
+  font-size:     14px;
+  font-weight:   600;
+  border:        none;
+  border-radius: var(--eb-btn-radius);
+  cursor:        pointer;
+  box-shadow:    0 4px 14px rgba(69, 40, 168, .28);
+  transition:    filter var(--eb-transition), box-shadow var(--eb-transition);
+}
+
+.eb-quiz__btn--accept:hover {
+  filter:     brightness(1.08);
+  box-shadow: 0 6px 20px rgba(69, 40, 168, .38);
+}
+
+/* «Нет, спасибо» */
+.eb-quiz__btn--decline {
+  flex:          1;
+  padding:       11px 16px;
+  background:    transparent;
+  color:         var(--eb-muted);
+  font-family:   var(--eb-font-ui);
+  font-size:     14px;
+  font-weight:   500;
+  border:        1.5px solid var(--eb-border);
+  border-radius: var(--eb-btn-radius);
+  cursor:        pointer;
+  transition:    color var(--eb-transition), border-color var(--eb-transition);
+}
+
+.eb-quiz__btn--decline:hover {
+  color:        var(--eb-violet-700);
+  border-color: var(--eb-violet-700);
+}
+
+
+/* ==========================================================================
+   4. Прогресс-бар
+   ========================================================================== */
+
+.eb-quiz__progress {
+  position:   relative;
+  padding-top: 6px;
+}
+
+/* Трек */
+.eb-quiz__progress::before {
+  content:       '';
+  position:      absolute;
+  top:           0;
+  left:          0;
+  right:         0;
+  height:        6px;
+  border-radius: 99px;
+  background:    var(--eb-border);
+}
+
+/* Заливка */
+.eb-quiz__progress-fill {
+  position:      absolute;
+  top:           0;
+  left:          0;
+  height:        6px;
+  border-radius: 99px;
+  background:    linear-gradient(90deg, var(--eb-violet-700), var(--eb-violet-900));
+  transition:    width .35s ease;
+}
+
+.eb-quiz__progress-label {
+  display:     block;
+  margin-top:  8px;
+  font-size:   11px;
+  font-weight: 500;
+  color:       var(--eb-muted);
+  text-align:  right;
+}
+
+
+/* ==========================================================================
+   5. Вопрос и ответы
+   ========================================================================== */
+
+.eb-quiz__question {
+  display:        flex;
+  flex-direction: column;
+  gap:            14px;
+}
+
+.eb-quiz__question-text {
+  margin:      0;
+  font-size:   15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color:       var(--eb-text);
+}
+
+.eb-quiz__answers {
+  display:        flex;
+  flex-direction: column;
+  gap:            8px;
+}
+
+.eb-quiz__answer {
+  width:         100%;
+  padding:       11px 14px;
+  text-align:    left;
+  font-family:   var(--eb-font-ui);
+  font-size:     14px;
+  font-weight:   400;
+  line-height:   1.4;
+  color:         var(--eb-text);
+  background:    #fff;
+  border:        1.5px solid var(--eb-border);
+  border-radius: var(--eb-btn-radius);
+  cursor:        pointer;
+  transition:
+    border-color  var(--eb-transition),
+    background    var(--eb-transition),
+    box-shadow    var(--eb-transition);
+}
+
+.eb-quiz__answer:hover {
+  border-color: var(--eb-violet-700);
+  background:   var(--eb-violet-050);
+}
+
+.eb-quiz__answer--selected {
+  border-color: var(--eb-violet-700);
+  background:   var(--eb-violet-050);
+  box-shadow:   inset 3px 0 0 var(--eb-violet-700);
+  font-weight:  500;
+  color:        var(--eb-violet-900);
+}
+
+
+/* ==========================================================================
+   6. Навигация (Назад / Следующий вопрос)
+   ========================================================================== */
+
+.eb-quiz__nav {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  gap:             10px;
+}
+
+.eb-quiz__btn {
+  display:       inline-flex;
+  align-items:   center;
+  justify-content: center;
+  padding:       10px 18px;
+  font-family:   var(--eb-font-ui);
+  font-size:     14px;
+  font-weight:   600;
+  line-height:   1;
+  border:        none;
+  border-radius: var(--eb-btn-radius);
+  cursor:        pointer;
+  transition:
+    background  var(--eb-transition),
+    box-shadow  var(--eb-transition),
+    filter      var(--eb-transition),
+    opacity     var(--eb-transition);
+}
+
+.eb-quiz__btn:disabled {
+  opacity: .42;
+  cursor:  not-allowed;
+}
+
+/* «Следующий вопрос» / «Далее» */
+.eb-quiz__btn--next {
+  background: linear-gradient(135deg, var(--eb-violet-700), var(--eb-violet-900));
+  color:      #fff;
+  box-shadow: 0 4px 14px rgba(69, 40, 168, .28);
+}
+
+.eb-quiz__btn--next:hover:not(:disabled) {
+  filter:     brightness(1.07);
+  box-shadow: 0 6px 20px rgba(69, 40, 168, .38);
+}
+
+/* «Назад» / «Изменить ответы» */
+.eb-quiz__btn--back {
+  background:  transparent;
+  color:       var(--eb-muted);
+  padding:     10px 6px;
+  font-weight: 500;
+}
+
+.eb-quiz__btn--back:hover {
+  color: var(--eb-violet-700);
+}
+
+
+/* ==========================================================================
+   7. Форма контактов
+   ========================================================================== */
+
+.eb-quiz__contacts {
+  display:        flex;
+  flex-direction: column;
+  gap:            16px;
+}
+
+.eb-quiz__contacts-title {
+  margin:      0;
+  font-size:   15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color:       var(--eb-text);
+}
+
+.eb-quiz__form {
+  display:        flex;
+  flex-direction: column;
+  gap:            12px;
+}
+
+.eb-quiz__field {
+  display:        flex;
+  flex-direction: column;
+  gap:            4px;
+}
+
+.eb-quiz__label {
+  font-size:   12px;
+  font-weight: 500;
+  color:       var(--eb-muted);
+}
+
+.eb-quiz__input {
+  width:         100%;
+  padding:       10px 12px;
+  font-family:   var(--eb-font-ui);
+  font-size:     14px;
+  color:         var(--eb-text);
+  background:    #fff;
+  border:        1.5px solid var(--eb-border);
+  border-radius: var(--eb-input-radius);
+  outline:       none;
+  box-sizing:    border-box;
+  transition:    border-color var(--eb-transition), box-shadow var(--eb-transition);
+}
+
+.eb-quiz__input::placeholder {
+  color: rgba(17, 17, 17, .35);
+}
+
+.eb-quiz__input:focus {
+  border-color: var(--eb-violet-700);
+  box-shadow:   0 0 0 3px rgba(101, 63, 229, .14);
+}
+
+.eb-quiz__input--error {
+  border-color: #e03c3c;
+  box-shadow:   0 0 0 3px rgba(224, 60, 60, .12);
+}
+
+.eb-quiz__field--checkbox { gap: 3px; }
+
+.eb-quiz__checkbox-label {
+  display:     flex;
+  align-items: flex-start;
+  gap:         8px;
+  font-size:   12px;
+  line-height: 1.45;
+  color:       var(--eb-muted);
+  cursor:      pointer;
+}
+
+.eb-quiz__checkbox {
+  flex-shrink:  0;
+  width:        16px;
+  height:       16px;
+  margin-top:   1px;
+  accent-color: var(--eb-violet-700);
+  cursor:       pointer;
+}
+
+.eb-quiz__field-error {
+  min-height:  15px;
+  font-size:   11px;
+  font-weight: 500;
+  color:       #e03c3c;
+  line-height: 1.3;
+}
+
+.eb-quiz__form-error {
+  min-height:  16px;
+  font-size:   12px;
+  font-weight: 500;
+  color:       #e03c3c;
+  text-align:  center;
+}
+
+/* Кнопка отправки — на всю ширину */
+.eb-quiz__btn--submit {
+  width:         100%;
+  padding:       13px 18px;
+  background:    linear-gradient(135deg, var(--eb-violet-700), var(--eb-violet-900));
+  color:         #fff;
+  font-size:     15px;
+  box-shadow:    0 4px 14px rgba(69, 40, 168, .28);
+}
+
+.eb-quiz__btn--submit:hover:not(:disabled) {
+  filter:     brightness(1.07);
+  box-shadow: 0 6px 20px rgba(69, 40, 168, .38);
+}
+
+
+/* ==========================================================================
+   8. Экран результата
+   ========================================================================== */
+
+.eb-quiz__result {
+  display:        flex;
+  flex-direction: column;
+  gap:            12px;
+  animation:      eb-popup-in .3s ease both;
+}
+
+.eb-quiz__result-label {
+  margin:         0;
+  font-size:      11px;
+  font-weight:    700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color:          var(--eb-violet-700);
+}
+
+.eb-quiz__result-title {
+  margin:      0;
+  font-family: var(--eb-font-display);
+  font-size:   22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color:       var(--eb-violet-900);
+}
+
+.eb-quiz__result-description {
+  margin:      0;
+  font-size:   14px;
+  line-height: 1.55;
+  color:       var(--eb-muted);
+}
+
+/* CTA-кнопка на экране результата — жёлтый акцент.
+   Рендерится как <a>, поэтому нужны display и text-decoration. */
+.eb-quiz__btn--cta {
+  display:         block;
+  width:           100%;
+  padding:         13px 18px;
+  background:      linear-gradient(135deg, var(--eb-yellow-500), #e8a23e);
+  color:           var(--eb-violet-900);
+  font-size:       15px;
+  text-align:      center;
+  text-decoration: none;
+  box-sizing:      border-box;
+  box-shadow:      0 4px 14px rgba(255, 188, 91, .38);
+}
+
+.eb-quiz__btn--cta:hover:not(:disabled) {
+  filter:     brightness(1.05);
+  box-shadow: 0 6px 20px rgba(255, 188, 91, .5);
+}
+
+
+/* ==========================================================================
+   9. Mobile — bottom sheet (max-width: 480px)
+   ========================================================================== */
+
+@media (max-width: 480px) {
+
+  .eb-quiz__overlay {
+    align-items: flex-end;
+  }
+
+  .eb-quiz__popup {
+    width:         100%;
+    max-width:     100%;
+    max-height:    92dvh;
+    border-radius: var(--eb-radius-lg) var(--eb-radius-lg) 0 0;
+    animation-name: eb-popup-mobile-in;
+  }
+
+  @keyframes eb-popup-mobile-in {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0);     }
+  }
+
+  .eb-quiz__body {
+    padding: 20px 16px 28px;
+  }
+
+  .eb-quiz__popup--expanded .eb-quiz__body {
+    padding-top: 40px;
+  }
+
+  .eb-quiz__teaser-actions {
+    flex-direction: column;
+  }
+
+  .eb-quiz__btn--accept,
+  .eb-quiz__btn--decline {
+    width: 100%;
+  }
+
+  .eb-quiz__nav {
+    flex-direction: column-reverse;
+    gap:            6px;
+  }
+
+  .eb-quiz__btn--next {
+    width: 100%;
+  }
+
+  .eb-quiz__btn--back {
+    width:      100%;
+    text-align: center;
+  }
+}

@@ -1,0 +1,266 @@
+{
+  "_comment": "quiz-config.json — конфигурация квиза для подбора курса.",
+
+  "quiz": {
+    "title": "Какой курс подходит именно вам?",
+    "description": "6 вопросов — и мы подберём курс под ваши цели и опыт.",
+
+    "settings": {
+      "shuffle_questions": false,
+      "shuffle_answers": false,
+      "show_progress": true,
+      "answer_type": "single_choice"
+    },
+
+    "scoring": {
+      "_comment": [
+        "Параметры накапливают очки по ответам пользователя.",
+        "Итоговый курс — тот, у которого сумма (paramScore × weight) максимальна.",
+        "",
+        "Логика маппинга параметров → курс:",
+        "  experienced + dev_interest / ai_tools → AI для разработчика",
+        "  career_change + dev_interest           → Web-разработка + AI",
+        "  career_change + data_interest          → Data Scientist + AI",
+        "  business + ai_tools                    → AI для бизнеса",
+        "  exploring                              → курс с наибольшим суммарным score"
+      ],
+
+      "parameters": [
+        { "id": "experienced",   "label": "Уже работает в IT" },
+        { "id": "career_change", "label": "Хочет перейти в IT" },
+        { "id": "business",      "label": "Офис / нетехническая роль" },
+        { "id": "exploring",     "label": "Ещё не определился" },
+        { "id": "dev_interest",  "label": "Интерес к разработке / коду" },
+        { "id": "data_interest", "label": "Интерес к данным и аналитике" },
+        { "id": "ai_tools",      "label": "Интерес к готовым AI-инструментам" }
+      ],
+
+      "results": [
+        {
+          "id": "ai_dev",
+          "title": "AI для разработчика",
+          "description": "Вы уже в IT и хотите прокачать навыки с AI: научитесь встраивать модели в продукты, работать с API и строить собственные AI-решения.",
+          "url": "https://elbrusboot.camp/ai-course/",
+          "weights": {
+            "experienced":   3.0,
+            "dev_interest":  2.0,
+            "ai_tools":      1.5,
+            "data_interest": 0.5,
+            "career_change": 0.0,
+            "business":      0.0,
+            "exploring":     0.3
+          }
+        },
+        {
+          "id": "web_ai",
+          "title": "Web-разработка + AI",
+          "description": "Вы хотите войти в IT через разработку. Курс даст фундамент в коде и покажет, как применять AI-инструменты уже с первых проектов.",
+          "url": "https://elbrusboot.camp/web-development/",
+          "weights": {
+            "career_change": 2.5,
+            "dev_interest":  3.0,
+            "ai_tools":      0.5,
+            "data_interest": 0.0,
+            "experienced":   0.0,
+            "business":      0.0,
+            "exploring":     0.3
+          }
+        },
+        {
+          "id": "data_ai",
+          "title": "Data Scientist + AI",
+          "description": "Вы хотите войти в IT через данные. Курс научит анализировать данные, строить модели и применять AI для предсказаний и аналитики.",
+          "url": "https://elbrusboot.camp/datascience/",
+          "weights": {
+            "career_change": 2.0,
+            "data_interest": 3.0,
+            "ai_tools":      0.5,
+            "dev_interest":  0.5,
+            "experienced":   0.5,
+            "business":      0.0,
+            "exploring":     0.3
+          }
+        },
+        {
+          "id": "ai_business",
+          "title": "AI для бизнеса",
+          "description": "Вы работаете в нетехнической сфере и хотите применять AI-инструменты в реальных задачах — без написания кода, но с реальным результатом.",
+          "url": "https://tg.elbrusboot.camp/ai_for_business",
+          "weights": {
+            "business":      3.0,
+            "ai_tools":      2.5,
+            "career_change": 0.5,
+            "data_interest": 0.5,
+            "dev_interest":  0.0,
+            "experienced":   0.0,
+            "exploring":     0.3
+          }
+        }
+      ]
+    },
+
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Как бы вы описали свой путь в IT прямо сейчас?",
+        "answers": [
+          {
+            "id": "q1_a1",
+            "text": "Я уже работаю в IT",
+            "scores": { "experienced": 2 }
+          },
+          {
+            "id": "q1_a2",
+            "text": "Хочу перейти в IT",
+            "scores": { "career_change": 2 }
+          },
+          {
+            "id": "q1_a3",
+            "text": "Работаю в бизнесе, хочу использовать AI в работе",
+            "scores": { "business": 2 }
+          },
+          {
+            "id": "q1_a4",
+            "text": "Только начинаю разбираться",
+            "scores": { "career_change": 1, "exploring": 1 }
+          }
+        ]
+      },
+
+      {
+        "id": "q2",
+        "text": "Что вас больше всего привлекает в мире технологий?",
+        "answers": [
+          {
+            "id": "q2_a1",
+            "text": "Создавать продукты и писать код",
+            "scores": { "dev_interest": 2 }
+          },
+          {
+            "id": "q2_a2",
+            "text": "Работать с данными и находить закономерности",
+            "scores": { "data_interest": 2 }
+          },
+          {
+            "id": "q2_a3",
+            "text": "Использовать готовые AI-инструменты для задач",
+            "scores": { "ai_tools": 2 }
+          },
+          {
+            "id": "q2_a4",
+            "text": "Ещё не понял, что именно мне ближе",
+            "scores": { "exploring": 2 }
+          }
+        ]
+      },
+
+      {
+        "id": "q3",
+        "text": "Как вы предпочтёте решать сложную задачу?",
+        "answers": [
+          {
+            "id": "q3_a1",
+            "text": "Напишу код и автоматизирую решение",
+            "scores": { "dev_interest": 2 }
+          },
+          {
+            "id": "q3_a2",
+            "text": "Покопаюсь в данных и найду паттерн",
+            "scores": { "data_interest": 2 }
+          },
+          {
+            "id": "q3_a3",
+            "text": "Найду готовый инструмент или сервис",
+            "scores": { "business": 1, "ai_tools": 1 }
+          },
+          {
+            "id": "q3_a4",
+            "text": "Пока не знаю — зависит от задачи",
+            "scores": { "exploring": 1 }
+          }
+        ]
+      },
+
+      {
+        "id": "q4",
+        "text": "Что важнее всего в новом обучении?",
+        "answers": [
+          {
+            "id": "q4_a1",
+            "text": "Получить профессию и войти в IT",
+            "scores": { "career_change": 2 }
+          },
+          {
+            "id": "q4_a2",
+            "text": "Углубить технические навыки и добавить AI",
+            "scores": { "experienced": 2, "dev_interest": 1 }
+          },
+          {
+            "id": "q4_a3",
+            "text": "Применять AI в текущей работе, без смены профессии",
+            "scores": { "business": 2 }
+          },
+          {
+            "id": "q4_a4",
+            "text": "Понять с чего вообще начать",
+            "scores": { "exploring": 2 }
+          }
+        ]
+      },
+
+      {
+        "id": "q5",
+        "text": "Как вы обычно принимаете решения?",
+        "answers": [
+          {
+            "id": "q5_a1",
+            "text": "Логика и структура — пишу алгоритм или план",
+            "scores": { "dev_interest": 2 }
+          },
+          {
+            "id": "q5_a2",
+            "text": "Доверяю интуиции и опыту",
+            "scores": { "business": 2 }
+          },
+          {
+            "id": "q5_a3",
+            "text": "Пока учусь — мне ещё сложно",
+            "scores": { "exploring": 1 }
+          },
+          {
+            "id": "q5_a4",
+            "text": "Опираюсь на цифры, графики и данные",
+            "scores": { "data_interest": 2 }
+          }
+        ]
+      },
+
+      {
+        "id": "q6",
+        "text": "Как выглядит ваш успех после обучения?",
+        "answers": [
+          {
+            "id": "q6_a1",
+            "text": "Получил оффер и работаю в IT-компании",
+            "scores": { "career_change": 2 }
+          },
+          {
+            "id": "q6_a2",
+            "text": "Коллеги приходят за советом по AI-инструментам",
+            "scores": { "experienced": 2, "ai_tools": 1 }
+          },
+          {
+            "id": "q6_a3",
+            "text": "Автоматизировал рутину и экономлю часы каждую неделю",
+            "scores": { "ai_tools": 2 }
+          },
+          {
+            "id": "q6_a4",
+            "text": "Построил модель, которая помогает принимать бизнес-решения",
+            "scores": { "data_interest": 2 }
+          }
+        ]
+      }
+    ]
+  }
+}
