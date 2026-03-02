@@ -41,6 +41,7 @@ const QuizWidget = (() => {
         phone: '',
       },
       timerHandle: null,
+      autoAdvanceTimer: null,
       containerEl: null,
     };
   }
@@ -137,20 +138,14 @@ const QuizWidget = (() => {
     return `
       <div class="eb-quiz__question" data-question-id="${esc(question.id)}">
         <img class="eb-quiz__question-img" src="images/${questionNumber}.png" alt="" />
-        ${renderProgressBar(questionNumber, total)}
+        <div class="eb-quiz__question-nav">
+          ${renderProgressBar(questionNumber, total)}
+        </div>
         <p class="eb-quiz__question-text">${esc(question.text)}</p>
         <div class="eb-quiz__answers">${answersHtml}</div>
-        <div class="eb-quiz__nav">
-          ${questionNumber > 1
-            ? `<button class="eb-quiz__btn eb-quiz__btn--back" data-action="prev" type="button">Назад</button>`
-            : '<span></span>'}
-          <button
-            class="eb-quiz__btn eb-quiz__btn--next"
-            data-action="next"
-            type="button"
-            ${selectedAnswerId ? '' : 'disabled'}
-          >${questionNumber === total ? 'Далее' : 'Следующий вопрос'}</button>
-        </div>
+        ${questionNumber > 1
+          ? `<button class="eb-quiz__btn eb-quiz__btn--back" data-action="prev" type="button">← Назад</button>`
+          : ''}
       </div>`;
   }
 
@@ -211,7 +206,7 @@ const QuizWidget = (() => {
           <div class="eb-quiz__field eb-quiz__field--checkbox">
             <label class="eb-quiz__checkbox-label">
               <input class="eb-quiz__checkbox" type="checkbox" name="consent" required />
-              <span>Согласен на обработку персональных данных</span>
+              <span>Я согласен(а) на <a href="https://elbrusboot.camp/privacy-policy/" target="_blank" rel="noopener noreferrer">обработку персональных данных</a></span>
             </label>
             <span class="eb-quiz__field-error" aria-live="polite"></span>
           </div>
@@ -391,8 +386,17 @@ const QuizWidget = (() => {
       b.classList.toggle('eb-quiz__answer--selected', b.dataset.answerId === answerId);
     });
 
-    const nextBtn = questionEl.querySelector('[data-action="next"]');
-    if (nextBtn) nextBtn.disabled = false;
+    // Сбрасываем предыдущий таймер (пользователь изменил ответ)
+    if (state.autoAdvanceTimer) {
+      clearTimeout(state.autoAdvanceTimer);
+    }
+
+    // Через 400мс запускаем fade-out, затем переход
+    state.autoAdvanceTimer = setTimeout(() => {
+      state.autoAdvanceTimer = null;
+      questionEl.classList.add('eb-quiz__question--exit');
+      setTimeout(() => handleNext(), 300);
+    }, 400);
   }
 
   function handleNext() {
@@ -408,6 +412,10 @@ const QuizWidget = (() => {
   }
 
   function handlePrev() {
+    if (state.autoAdvanceTimer) {
+      clearTimeout(state.autoAdvanceTimer);
+      state.autoAdvanceTimer = null;
+    }
     if (state.currentQuestionIndex > 0) {
       state.currentQuestionIndex -= 1;
       remount();
