@@ -24,7 +24,7 @@
   --eb-radius-lg:    20px;
   --eb-shadow-lg:    0 20px 60px rgba(0, 0, 0, .18);
 
-  --eb-popup-width:  360px;
+  --eb-popup-width:  480px;
   --eb-btn-radius:   12px;
   --eb-input-radius: 10px;
   --eb-transition:   0.2s ease;
@@ -56,7 +56,7 @@
 
 .eb-quiz__popup {
   position:      relative;
-  width:         360px;
+  width:         var(--eb-popup-width);
   max-width:     calc(100vw - 32px);
   max-height:    90vh;
   overflow-y:    auto;
@@ -122,6 +122,15 @@
 /* ==========================================================================
    3. Тизер — первый экран (маленькая карточка)
    ========================================================================== */
+
+.eb-quiz__teaser-img {
+  display:       block;
+  width:         100%;
+  height:        160px;
+  max-height:    220px;
+  border-radius: var(--eb-radius-lg) var(--eb-radius-lg) 0 0;
+  object-fit:    cover;
+}
 
 .eb-quiz__teaser {
   display:        flex;
@@ -238,6 +247,14 @@
 /* ==========================================================================
    5. Вопрос и ответы
    ========================================================================== */
+
+.eb-quiz__question-img {
+  display:       block;
+  width:         100%;
+  max-height:    180px;
+  object-fit:    cover;
+  border-radius: var(--eb-radius-lg) var(--eb-radius-lg) 0 0;
+}
 
 .eb-quiz__question {
   display:        flex;
@@ -368,6 +385,14 @@
   font-weight: 600;
   line-height: 1.4;
   color:       var(--eb-text);
+}
+
+.eb-quiz__contacts-subtitle {
+  margin:      0;
+  font-size:   13px;
+  font-weight: 400;
+  line-height: 1.5;
+  color:       var(--eb-muted);
 }
 
 .eb-quiz__form {

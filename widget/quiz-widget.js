@@ -32,7 +32,7 @@ const QuizWidget = (() => {
   function createInitialState(config) {
     return {
       config,                   // полный объект quiz.* из quiz-config.json
-      currentStep: 'teaser',    // 'teaser' | 'questions' | 'contacts_1' | 'contacts_2' | 'result'
+      currentStep: 'teaser',    // 'teaser' | 'questions' | 'contacts_1' | 'contacts_2' | 'contacts_3' | 'result'
       currentQuestionIndex: 0,
       answers: {},              // { [questionId]: answerId }
       contactData: {            // накапливается между двумя шагами формы
@@ -98,8 +98,8 @@ const QuizWidget = (() => {
   function renderTeaser() {
     return `
       <div class="eb-quiz__teaser">
-        <p class="eb-quiz__teaser-title">У нас есть курсы для разных уровней и целей: от смены профессии до прокачки текущих навыков с AI.</p>
-        <p class="eb-quiz__teaser-subtitle">Пройдите короткий тест и мы покажем, какой из них даст вам максимум.<br>Это займёт всего 3 минуты и 6 вопросов.</p>
+        <p class="eb-quiz__teaser-title">Подберём курс под вашу цель</p>
+        <p class="eb-quiz__teaser-subtitle">3 минуты · 6 вопросов</p>
         <div class="eb-quiz__teaser-actions">
           <button class="eb-quiz__btn eb-quiz__btn--accept" data-action="accept" type="button">
             Подобрать курс
@@ -136,6 +136,7 @@ const QuizWidget = (() => {
 
     return `
       <div class="eb-quiz__question" data-question-id="${esc(question.id)}">
+        <img class="eb-quiz__question-img" src="images/${questionNumber}.png" alt="" />
         ${renderProgressBar(questionNumber, total)}
         <p class="eb-quiz__question-text">${esc(question.text)}</p>
         <div class="eb-quiz__answers">${answersHtml}</div>
@@ -153,14 +154,14 @@ const QuizWidget = (() => {
       </div>`;
   }
 
-  // Шаг 1: имя + email
+  // Шаг 1: имя
   function renderContactsStep1() {
     const total = state.config.questions.length;
-    const { name, email } = state.contactData;
+    const { name } = state.contactData;
     return `
       <div class="eb-quiz__contacts">
         ${renderProgressBar(total, total)}
-        <p class="eb-quiz__contacts-title">Почти готово — осталось пара шагов</p>
+        <p class="eb-quiz__contacts-title">Как вас зовут?</p>
         <form class="eb-quiz__form" data-step="1" novalidate>
           <div class="eb-quiz__field">
             <label class="eb-quiz__label" for="eb-quiz-name">Ваше имя</label>
@@ -176,6 +177,23 @@ const QuizWidget = (() => {
             />
             <span class="eb-quiz__field-error" aria-live="polite"></span>
           </div>
+          <button class="eb-quiz__btn eb-quiz__btn--submit" type="submit">Далее</button>
+          <p class="eb-quiz__form-error" aria-live="polite"></p>
+        </form>
+        <button class="eb-quiz__btn eb-quiz__btn--back" data-action="to-questions" type="button">← Изменить ответы</button>
+      </div>`;
+  }
+
+  // Шаг 2: email + согласие ПДн
+  function renderContactsStep2() {
+    const total = state.config.questions.length;
+    const { email } = state.contactData;
+    return `
+      <div class="eb-quiz__contacts">
+        ${renderProgressBar(total, total)}
+        <p class="eb-quiz__contacts-title">Куда отправить результаты?</p>
+        <p class="eb-quiz__contacts-subtitle">Мы отправим рекомендацию на ваш e-mail</p>
+        <form class="eb-quiz__form" data-step="2" novalidate>
           <div class="eb-quiz__field">
             <label class="eb-quiz__label" for="eb-quiz-email">Email</label>
             <input
@@ -190,22 +208,30 @@ const QuizWidget = (() => {
             />
             <span class="eb-quiz__field-error" aria-live="polite"></span>
           </div>
+          <div class="eb-quiz__field eb-quiz__field--checkbox">
+            <label class="eb-quiz__checkbox-label">
+              <input class="eb-quiz__checkbox" type="checkbox" name="consent" required />
+              <span>Согласен на обработку персональных данных</span>
+            </label>
+            <span class="eb-quiz__field-error" aria-live="polite"></span>
+          </div>
           <button class="eb-quiz__btn eb-quiz__btn--submit" type="submit">Далее</button>
           <p class="eb-quiz__form-error" aria-live="polite"></p>
         </form>
-        <button class="eb-quiz__btn eb-quiz__btn--back" data-action="to-questions" type="button">← Изменить ответы</button>
+        <button class="eb-quiz__btn eb-quiz__btn--back" data-action="to-contacts-1" type="button">← Назад</button>
       </div>`;
   }
 
-  // Шаг 2: телефон + согласие ПДн
-  function renderContactsStep2() {
+  // Шаг 3: телефон
+  function renderContactsStep3() {
     const total = state.config.questions.length;
     const { phone } = state.contactData;
     return `
       <div class="eb-quiz__contacts">
         ${renderProgressBar(total, total)}
-        <p class="eb-quiz__contacts-title">Последний шаг — и вы узнаете свой результат</p>
-        <form class="eb-quiz__form" data-step="2" novalidate>
+        <img class="eb-quiz__question-img" src="images/final.png" alt="" />
+        <p class="eb-quiz__contacts-title">Почти всё! Сейчас вы узнаете ваш карьерный трек</p>
+        <form class="eb-quiz__form" data-step="3" novalidate>
           <div class="eb-quiz__field">
             <label class="eb-quiz__label" for="eb-quiz-phone">Телефон</label>
             <input
@@ -220,29 +246,22 @@ const QuizWidget = (() => {
             />
             <span class="eb-quiz__field-error" aria-live="polite"></span>
           </div>
-          <div class="eb-quiz__field eb-quiz__field--checkbox">
-            <label class="eb-quiz__checkbox-label">
-              <input class="eb-quiz__checkbox" type="checkbox" name="consent" required />
-              <span>Согласен на обработку персональных данных</span>
-            </label>
-            <span class="eb-quiz__field-error" aria-live="polite"></span>
-          </div>
           <button class="eb-quiz__btn eb-quiz__btn--submit" type="submit">Узнать мой курс</button>
           <p class="eb-quiz__form-error" aria-live="polite"></p>
         </form>
-        <button class="eb-quiz__btn eb-quiz__btn--back" data-action="to-contacts-1" type="button">← Назад</button>
+        <button class="eb-quiz__btn eb-quiz__btn--back" data-action="to-contacts-2" type="button">← Назад</button>
       </div>`;
   }
 
   function renderResult(result) {
     const ctaHtml = result.url
       ? `<a class="eb-quiz__btn eb-quiz__btn--cta" href="${esc(result.url)}" target="_blank" rel="noopener noreferrer">
-           Узнать подробнее
+           Перейти на страницу курса
          </a>`
       : '';
     return `
       <div class="eb-quiz__result">
-        <p class="eb-quiz__result-label">Ваш курс</p>
+        <p class="eb-quiz__result-label">Ваш идеальный курс</p>
         <h2 class="eb-quiz__result-title">${esc(result.courseTitle)}</h2>
         <p class="eb-quiz__result-description">${esc(result.description)}</p>
         ${ctaHtml}
@@ -256,7 +275,7 @@ const QuizWidget = (() => {
         <div class="eb-quiz__popup${isExpanded ? ' eb-quiz__popup--expanded' : ''}" role="dialog" aria-modal="true" aria-label="Квиз подбора курса">
           ${isExpanded
             ? `<button class="eb-quiz__close" data-action="close" type="button" aria-label="Закрыть">✕</button>`
-            : ''}
+            : `<img class="eb-quiz__teaser-img" src="images/Koddi main.png" alt="" />`}
           <div class="eb-quiz__body">
             ${contentHtml}
           </div>
@@ -298,6 +317,9 @@ const QuizWidget = (() => {
     if (currentStep === 'contacts_2') {
       return renderContactsStep2();
     }
+    if (currentStep === 'contacts_3') {
+      return renderContactsStep3();
+    }
     return ''; // 'result' — рендерится отдельно после получения результата
   }
 
@@ -325,8 +347,9 @@ const QuizWidget = (() => {
     if (form) {
       form.onsubmit = (e) => {
         e.preventDefault();
-        if (form.dataset.step === '1') handleContactsStep1Submit(form);
-        else                           handleContactsStep2Submit(form);
+        if      (form.dataset.step === '1') handleContactsStep1Submit(form);
+        else if (form.dataset.step === '2') handleContactsStep2Submit(form);
+        else                               handleContactsStep3Submit(form);
       };
     }
   }
@@ -337,9 +360,10 @@ const QuizWidget = (() => {
       case 'decline':      handleDecline();     break;
       case 'next':         handleNext();        break;
       case 'prev':         handlePrev();        break;
-      case 'to-questions':  handleToQuestions();   break;
+      case 'to-questions':  handleToQuestions();    break;
       case 'to-contacts-1': handleToContactsStep1(); break;
-      case 'close':         handleClose();          break;
+      case 'to-contacts-2': handleToContactsStep2(); break;
+      case 'close':         handleClose();           break;
     }
   }
 
@@ -400,50 +424,45 @@ const QuizWidget = (() => {
     remount();
   }
 
+  function handleToContactsStep2() {
+    state.currentStep = 'contacts_2';
+    remount();
+  }
+
   function handleClose() {
     recordShown();
     destroy();
   }
 
-// ---------------------------------------------------------------------------
-  // Отправка форм контактов (два шага)
+  // ---------------------------------------------------------------------------
+  // Отправка форм контактов (три шага)
   // ---------------------------------------------------------------------------
 
-  // Шаг 1: валидация имени и email, сохранение в state, переход на шаг 2
+  // Шаг 1: валидация имени, переход на шаг 2
   function handleContactsStep1Submit(form) {
     clearFormErrors(form);
 
-    const name  = form.name.value.trim();
-    const email = form.email.value.trim();
-    let hasErrors = false;
-
+    const name = form.name.value.trim();
     if (!name) {
       setFieldError(form, 'name', 'Введите ваше имя');
-      hasErrors = true;
+      return;
     }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setFieldError(form, 'email', 'Введите корректный email');
-      hasErrors = true;
-    }
-    if (hasErrors) return;
 
-    // Сохраняем данные шага 1 и переходим к шагу 2
-    state.contactData.name  = name;
-    state.contactData.email = email;
+    state.contactData.name = name;
     state.currentStep = 'contacts_2';
     remount();
   }
 
-  // Шаг 2: валидация телефона и согласия, отправка лида, показ результата
+  // Шаг 2: валидация email и согласия, переход на шаг 3
   function handleContactsStep2Submit(form) {
     clearFormErrors(form);
 
-    const phone   = form.phone.value.trim();
+    const email   = form.email.value.trim();
     const consent = form.consent.checked;
     let hasErrors = false;
 
-    if (!phone) {
-      setFieldError(form, 'phone', 'Введите номер телефона');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setFieldError(form, 'email', 'Введите корректный email');
       hasErrors = true;
     }
     if (!consent) {
@@ -452,7 +471,21 @@ const QuizWidget = (() => {
     }
     if (hasErrors) return;
 
-    // Сохраняем телефон и вычисляем результат
+    state.contactData.email = email;
+    state.currentStep = 'contacts_3';
+    remount();
+  }
+
+  // Шаг 3: валидация телефона, отправка лида, показ результата
+  function handleContactsStep3Submit(form) {
+    clearFormErrors(form);
+
+    const phone = form.phone.value.trim();
+    if (!phone) {
+      setFieldError(form, 'phone', 'Введите номер телефона');
+      return;
+    }
+
     state.contactData.phone = phone;
     const result = QuizLogic.getResult(Object.values(state.answers), state.config);
 
